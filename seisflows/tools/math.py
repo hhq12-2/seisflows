@@ -74,7 +74,7 @@ def poissons_ratio(vp, vs):
 def parabolic_backtrack(f0, g0, x1, f1, b1=0.1, b2=0.5):
     """
     Safeguarded parabolic backtracking function
-    Equation provided in Nocedal & Wright, 2006 ??
+    Equation provided in Nocedal & Wright, 2006 Equation 3.58
 
     :type f0: float
     :param f0: initial misfit function value

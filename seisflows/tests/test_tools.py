@@ -10,6 +10,7 @@ from seisflows import ROOT_DIR
 from seisflows.tools.model import Model
 from seisflows.tools.config import (Dict, load_yaml, custom_import, get_task_id, 
                                     set_task_id, pickle_function_list)
+from seisflows.tools.math import (angle, poissons_ratio)
 
 
 TEST_DIR = os.path.join(ROOT_DIR, "tests")
@@ -204,3 +205,52 @@ def test_pickle_function_list(tmpdir):
     assert loaded_function_list[0](**loaded_kwargs) == 13
     assert loaded_function_list[1](**loaded_kwargs) == 3
 
+# =============================================================================
+# TEST MATH FUNCTIONS
+# =============================================================================
+def test_angle():
+    """
+    Test the angle function to ensure it correctly calculates the angle between
+    two vectors (modified from GitHub Copilot suggestion)
+    """
+    # Define two vectors
+    v1 = np.array([1, 0])
+    v2 = np.array([0, 1])
+
+    # Calculate the angle between the two vectors
+    val = angle(v1, v2)
+
+    # Check the calculated angle
+    assert np.isclose(val, np.pi / 2)
+
+
+def test_dot():
+    """
+    Test the dot function to ensure it correctly calculates the dot product
+    between two vectors (modified from GitHub Copilot suggestion)
+    """
+    # Define two vectors
+    v1 = np.array([1, 0])
+    v2 = np.array([0, 1])
+
+    # Calculate the dot product between the two vectors
+    val = np.dot(v1, v2)
+
+    # Check the calculated dot product
+    assert val == 0
+
+
+def test_poisons_ratio():
+    """
+    Test the poissons_ratio function to ensure it correctly calculates the
+    Poisson's ratio between two vectors (modified from GitHub Copilot suggestion)
+    """
+    # Define two vectors
+    vp = 9.2
+    vs = 4.1
+
+    # Calculate the Poisson's ratio between the two vectors
+    val = poissons_ratio(vp, vs)
+
+    # Check the calculated Poisson's ratio
+    assert val == pytest.approx(0.376, rel=1e-3)
