@@ -268,7 +268,6 @@ def nproc():
 
     TODO replace all instances of nproc() with os.cpu_count()
 
-
     :rtype: int
     :return: number of processors
     :raises EnvironmentError: if nproc cannot be determined

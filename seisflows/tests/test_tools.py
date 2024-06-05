@@ -16,6 +16,9 @@ TEST_MODEL = os.path.join(TEST_DIR, "test_data", "test_tools",
                           "test_file_formats")
 
 
+# =============================================================================
+# TEST MODEL CLASS 
+# =============================================================================
 def test_model_attributes():
     """
     Check that model values are read in correctly and accessible in a way we 
