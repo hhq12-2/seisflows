@@ -254,3 +254,4 @@ def test_poisons_ratio():
 
     # Check the calculated Poisson's ratio
     assert val == pytest.approx(0.376, rel=1e-3)
+

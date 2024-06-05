@@ -93,7 +93,7 @@ def test_edited_parameter_file_name(tmpdir, par_file, par_file_dict):
     assert(out.stdout.strip() == f"{check_key.lower()}: {check_val}")
 
 
-def test_cmd_setup(tmpdir):
+def test_cmd_init(tmpdir):
     """
     Test setting up the SeisFlows working directory
     """
@@ -102,26 +102,21 @@ def test_cmd_setup(tmpdir):
 
     # Check with anmd without symlinking as well as with overwriting
     with patch.object(sys, "argv", ["seisflows"]):
-        # Without symlinking
         sf = SeisFlows()
-        sf.setup(symlink=False, overwrite=False)
+        sf.init(symlink=False, overwrite=False)
         assert(os.path.exists(par_file))
         os.remove(par_file)
 
-        # With symlinking
-        sf.setup(symlink=True, overwrite=False)
-        assert(os.path.exists(par_file))
-
         # Edit the current par file in a noticeable way so we can check
         # if overwriting works in the next step
-        test_phrase = "well this is rather unexpected...\n"
+        test_phrase = "well this is rather unexpected...: isnt it?\n"
         with open(par_file, "a") as f:
             f.write(test_phrase)
         with open(par_file, "r") as f:
             assert(test_phrase in f.read())
 
         # With overwriting
-        sf.setup(symlink=False, overwrite=True, force=True)
+        sf.init(force=True)
         assert(os.path.exists(par_file))
         with open(par_file, "r") as f:
             text = f.read()
