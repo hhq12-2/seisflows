@@ -1,14 +1,15 @@
 """
 Test any of the utility functions defined in the Tools directory
 """
+import dill
 import os
 import pytest
 import numpy as np
 from glob import glob
 from seisflows import ROOT_DIR
-from seisflows.tools.config import Dict
 from seisflows.tools.model import Model
-from seisflows.tools.config import custom_import
+from seisflows.tools.config import (Dict, load_yaml, custom_import, get_task_id, 
+                                    set_task_id, pickle_function_list)
 
 
 TEST_DIR = os.path.join(ROOT_DIR, "tests")
@@ -69,7 +70,9 @@ def test_model_from_input_vector():
     assert(m.ngll == [2])
     assert(m.parameters == ["x"])
 
-
+# =============================================================================
+# TEST CONFIG FUNCTIONS
+# =============================================================================
 def test_custom_import():
     """
     Test that importing based on internal modules works for various inputs
@@ -88,3 +91,116 @@ def test_custom_import():
     module = custom_import(name="preprocess", module="default")
     assert(module.__name__ == "Default")
     assert(module.__module__ == "seisflows.preprocess.default")
+
+
+def test_dict_class():
+    """
+    Test the functionality of the Dict class to make sure we can access and
+    assign values a certain way (modified from GitHub Copilot suggestion)
+    """
+    # Create a dictionary
+    data = {"key1": "value1", "key2": "value2", "key3": "value3"}
+    d = Dict(data)
+
+    # Test accessing values
+    assert d.key1 == "value1"
+    assert d.key2 == "value2"
+    assert d.key3 == "value3"
+
+    # Test modifying values
+    d.key1 = "new_value1"
+    assert d.key1 == "new_value1"
+
+    # Test adding new key-value pairs
+    d.key4 = "value4"
+    assert d.key4 == "value4"
+
+    # Test deleting key-value pairs
+    del d["key2"]
+    assert not hasattr(d, "key2")
+
+def test_load_yaml(tmpdir):
+    """
+    Test the functionality of the load_yaml function to ensure it correctly
+    loads YAML files (modified from GitHub Copilot suggestion)
+    """
+    # Create a temporary YAML file
+    yaml_content = f"""
+    key1: value1
+    key2: value2
+    key3:
+        - item1
+        - item2
+        - item3
+    key4: inf
+    key5: null
+    path_test: {tmpdir}/path/to/dir
+    """
+    yaml_file = os.path.join(tmpdir, "test.yaml")
+    with open(yaml_file, "w") as f:
+        f.write(yaml_content)
+
+    # Load the YAML file
+    config = load_yaml(yaml_file)
+
+    # Test the loaded values
+    assert config["key1"] == "value1"
+    assert config["key2"] == "value2"
+    assert config["key3"] == ["item1", "item2", "item3"]
+    # Specific value changes only specified for SeisFlows
+    assert config["key4"] == np.inf
+    assert config["key5"] is None
+    assert config["path_test"] == os.path.join(tmpdir, "path/to/dir")
+
+
+def test_get_set_task_id():
+    """
+    Test the functionality of get_task_id and set_task_id functions
+    (modified from GitHub Copilot suggestion)
+    """
+    # Set a task ID
+    set_task_id(123)
+    # Get the task ID and check if it matches the set value
+    assert get_task_id() == 123
+    # Set a different task ID
+    set_task_id(456)
+    # Get th task ID again and check if it matches the new set value
+    assert get_task_id() == 456
+
+
+def test_pickle_function_list(tmpdir):
+    """
+    Test the functionality of pickle_function_list to ensure it correctly
+    pickles a list of functions (modified from GitHub Copilot suggestion) and
+    kwargs and that they can be recovered
+    """
+    # Define a list of functions
+    def add(a, b):
+        return a + b
+
+    def subtract(a, b):
+        return a - b
+
+    function_list = [add, subtract]
+    kwargs = {"a": 8, "b": 5}
+
+    # Pickle the function list
+    pickle_function_list(function_list, path=tmpdir, **kwargs)
+
+    # These are hardcoded naming conventions from the function
+    pickle_file_name = os.path.join(tmpdir, "add_subtract.p")
+    pickle_file_kwargs = os.path.join(tmpdir, "add_subtract_kwargs.p")
+
+    # Load the pickled function list
+    with open(pickle_file_name, "rb") as f:
+        loaded_function_list = dill.load(f)
+    
+    with open(pickle_file_kwargs, "rb") as f:
+        loaded_kwargs = dill.load(f)
+
+    # Test the loaded function list and the loaded kwarg list by checking the
+    # values add up
+    assert len(loaded_function_list) == len(function_list)
+    assert loaded_function_list[0](**loaded_kwargs) == 13
+    assert loaded_function_list[1](**loaded_kwargs) == 3
+
