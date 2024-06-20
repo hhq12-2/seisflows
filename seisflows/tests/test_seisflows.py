@@ -187,3 +187,43 @@ def test_cmd_par(tmpdir, par_file):
     assert(par.strip() == parameter)
     assert(val.strip() == new_val)
 
+
+# def test_cmd_swap(tmpdir, par_file):
+#     """
+#     Test swapping the parameter file
+#     """
+#     # Create a new parameter file
+#     os.chdir(tmpdir)
+
+#     # run seisflows configure
+#     with patch.object(sys, "argv", ["seisflows"]):
+#         sf = SeisFlows(workdir=tmpdir, parameter_file="parameters.yaml")
+#         sf.configure()
+    
+#     import pdb;pdb.set_trace()
+#         # sf.swap("")
+
+def test_cmd_swap(tmpdir, par_file):
+    """
+    Test swapping the module and classname in the parameter file
+    """
+    os.chdir(tmpdir)
+    # Create a new parameter file
+    with patch.object(sys, "argv", ["seisflows"]):
+        sf = SeisFlows(workdir=tmpdir, parameter_file="parameters.yaml")
+        sf.configure()
+
+    parameters = load_yaml(par_file)
+    # Check a random parameter that should not exist
+    assert(parameters["preprocess"] == "default")
+    assert("fix_windows" not in parameters)        
+
+    # Swap the module and classname
+    with patch.object(sys, "argv", ["seisflows"]):
+        sf = SeisFlows(workdir=tmpdir, parameter_file="parameters.yaml")
+        sf.swap("preprocess", "pyaflowa")
+
+    # Check if the module and classname are swapped in the parameter file
+    parameters = load_yaml(par_file)
+    assert(parameters["preprocess"] == "pyaflowa")
+    assert("fix_windows" in parameters)        
