@@ -3,9 +3,10 @@
 Base class for interaction with SPECFEM++
 """
 import os
+import yaml
 from glob import glob
 
-from seisflows.tools.config import get_task_id, Dict
+from seisflows.tools.config import get_task_id, Dict, load_yaml
 from seisflows.tools import unix
 
 
@@ -159,3 +160,19 @@ class SpecfemPP:
             if only running forward simulations.
         """
         pass
+
+
+def getpar(key, file, delim="=", match_partial=False, comment="#",):
+    """
+    Query a parameter from a SPECFEM++ YAML parameter file
+    """
+    # Load SPECFEM++ Yaml parameter file, get queried parameter and return
+    pass
+
+
+def setpar(key, val, file, delim="=", **kwargs):
+    """
+    Overwrite an existing parameter in a SPECFEM++ YAML parameter file
+    """
+    # Load YAML parameter file, overwrite current value, overwrite file
+    pass
